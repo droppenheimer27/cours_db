@@ -10,7 +10,7 @@ namespace Pawliner.Web.Controllers
 {
     [Route("api/{controller}")]
     [ApiController]
-    public class ExecutorsController
+    public class ExecutorsController : ControllerBase
     {
         private readonly ApplicationContext _database;
 

@@ -1,11 +1,11 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using Pawliner.DataProvider.Models;
 
 namespace Pawliner.DataProvider.Context
 {
     public class ApplicationContext : DbContext
     {
+        public DbSet<AspNetUser> AspNetUsers { get; set; }
         public DbSet<Order> Orders { get; set; }
         public DbSet<Executor> Executors { get; set; }
         public DbSet<Respond> Responds { get; set; }
