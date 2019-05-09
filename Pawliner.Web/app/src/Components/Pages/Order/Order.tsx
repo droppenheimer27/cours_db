@@ -2,6 +2,7 @@ import React from 'react';
 import { observer } from 'mobx-react';
 import { observable } from 'mobx';
 import { Button } from 'react-bootstrap';
+import { Link } from 'react-router-dom';
 
 import ApiService from '../../../Services/ApiService';
 import { ApiUrls } from '../../../AppConstants';
@@ -111,36 +112,40 @@ export default class Order extends React.Component<IOrderProps, {}> {
                     </div>
                 )}
                 <hr />
-                {(this.responds || []).map((respond, index) => {
-                    return (
-                        <div
-                            key={respond.id + index}
-                            className="row"
-                            style={{
-                                backgroundColor: '#ffffff',
-                                marginTop: '3rem',
-                                marginLeft: '20rem',
-                                marginRight: '20rem',
-                                display: 'flex',
-                                justifyContent: 'flex-start',
-                                padding: '2rem'
-                            }}
-                        >
-                            <div className="box">
-                                <div className="row">
-                                    <div className="col text-white">
-                                        <h5>
-                                            <a
-                                                className="text-orange"
-                                                href="#!/main/executor/<%= Executor.Id %>"
-                                            >
-                                                {respond.firstName +
-                                                    ' ' +
-                                                    respond.lastName}
-                                            </a>
-                                        </h5>
-                                    </div>
-                                    {/* <div className="col">
+                {(this.responds || []).map(
+                    (respond: RespondModel, index: number) => {
+                        return (
+                            <div
+                                key={respond.id + index}
+                                className="row"
+                                style={{
+                                    backgroundColor: '#ffffff',
+                                    marginTop: '3rem',
+                                    marginLeft: '20rem',
+                                    marginRight: '20rem',
+                                    display: 'flex',
+                                    justifyContent: 'flex-start',
+                                    padding: '2rem'
+                                }}
+                            >
+                                <div className="box">
+                                    <div className="row">
+                                        <div className="col text-white">
+                                            <h5>
+                                                <Link
+                                                    to={
+                                                        'executors/' +
+                                                        respond.executorId
+                                                    }
+                                                    className="text-orange"
+                                                >
+                                                    {respond.firstName +
+                                                        ' ' +
+                                                        respond.lastName}
+                                                </Link>
+                                            </h5>
+                                        </div>
+                                        {/* <div className="col">
                                         <% if (Executor.UserId === window.app.model.get('userId')) { %>
                                             <a className="text-white pull-right edit-respond" href="" style="margin-right: 80px;">Edit a respond</a>
                                         <% } %>
@@ -148,27 +153,28 @@ export default class Order extends React.Component<IOrderProps, {}> {
                                             <a className="text-white pull-right submit-respond" href="" style="margin-right: 80px;">Submit</a>
                                         <% } %>
                                     </div> */}
-                                </div>
-                                <div className="box-body">
-                                    <div className="row">
-                                        <div className="col">
-                                            <p>{respond.content}</p>
-                                        </div>
                                     </div>
-                                    <div className="row">
-                                        <div className="col">
-                                            <p>
-                                                <small className="text-muted">
-                                                    {respond.createdAt}
-                                                </small>
-                                            </p>
+                                    <div className="box-body">
+                                        <div className="row">
+                                            <div className="col">
+                                                <p>{respond.content}</p>
+                                            </div>
+                                        </div>
+                                        <div className="row">
+                                            <div className="col">
+                                                <p>
+                                                    <small className="text-muted">
+                                                        {respond.createdAt}
+                                                    </small>
+                                                </p>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                    );
-                })}
+                        );
+                    }
+                )}
             </React.Fragment>
         );
     }

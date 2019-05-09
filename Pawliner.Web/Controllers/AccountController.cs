@@ -37,6 +37,17 @@ namespace Pawliner.Web.Controllers
                 var user = await _database.AspNetUsers.FirstOrDefaultAsync(u => u.UserName == model.UserName);
                 if (user != null)
                 {
+                    var param = new SqlParameter
+                    {
+                        ParameterName = "@id",
+                        SqlDbType = System.Data.SqlDbType.Int,
+                        Direction = System.Data.ParameterDirection.Output,
+                        Size = 50
+                    };
+
+                    await _database.Database.ExecuteSqlCommandAsync("dbo.IS_EXECUTOR @userId, @id OUT", new SqlParameter("@userId", user.Id), param);
+                    var isExecutor = param.Value != DBNull.Value;
+
                     var identity = GetIdentity(model.UserName, model.Password);
                     if (identity == null)
                     {
@@ -58,7 +69,8 @@ namespace Pawliner.Web.Controllers
                     {
                         token = encodedJwt,
                         userName = identity.Name,
-                        userId = user.Id
+                        userId = user.Id,
+                        isExecutor
                     };
 
                     return Ok(JsonConvert.SerializeObject(response, new JsonSerializerSettings { Formatting = Formatting.Indented }));
@@ -100,8 +112,10 @@ namespace Pawliner.Web.Controllers
 
                     var response = new
                     {
-                        access_token = encodedJwt,
-                        userName = identity.Name
+                        token = encodedJwt,
+                        userName = identity.Name,
+                        userId = user.Id,
+                        isExecutor = false
                     };
 
                     return Ok(JsonConvert.SerializeObject(response, new JsonSerializerSettings { Formatting = Formatting.Indented }));

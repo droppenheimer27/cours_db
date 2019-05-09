@@ -2,4 +2,5 @@ export default class TokenModel {
     token: string = '';
     userName: string = '';
     userId: string = '';
+    isExecutor: boolean = false;
 }

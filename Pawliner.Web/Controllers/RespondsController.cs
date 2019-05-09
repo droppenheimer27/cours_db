@@ -1,9 +1,12 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Pawliner.DataProvider.Context;
 using Pawliner.DataProvider.Models;
+using Pawliner.Web.ViewModels;
 using System.Collections.Generic;
 using System.Data.SqlClient;
+using System.Threading.Tasks;
 
 namespace Pawliner.Web.Controllers
 {
@@ -24,6 +27,53 @@ namespace Pawliner.Web.Controllers
             var responds = _database.Responds.FromSql("dbo.GET_RESPONDS @id", new SqlParameter("@id", id));
 
             return responds;
+        }
+
+        [Authorize]
+        [HttpPost]
+        public async Task<IActionResult> Post(RespondViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                await _database.Database.ExecuteSqlCommandAsync("dbo.INSERT_RESPOND @content, @executorId",
+                    new SqlParameter("@content", model.Content),
+                    new SqlParameter("@executorId", model.ExecutorId));
+
+                return Ok(model);
+            }
+
+            return BadRequest();
+        }
+
+        [Authorize]
+        [HttpPut]
+        public async Task<IActionResult> Put(EditRespondViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                await _database.Database.ExecuteSqlCommandAsync("dbo.UPDATE_RESPOND @id, @content",
+                    new SqlParameter("@id", model.Id),
+                    new SqlParameter("@content", model.Content));
+
+                return Ok(model);
+            }
+
+            return BadRequest();
+        }
+
+        [Authorize]
+        [HttpDelete]
+        public async Task<IActionResult> Delete(int id)
+        {
+            if (ModelState.IsValid)
+            {
+                await _database.Database.ExecuteSqlCommandAsync("dbo.DELETE_RESPOND @id",
+                    new SqlParameter("@id", id));
+
+                return Ok(id);
+            }
+
+            return BadRequest();
         }
     }
 }

@@ -1,4 +1,4 @@
-import { observable, action } from 'mobx';
+import { observable, action, computed } from 'mobx';
 
 class AppStore {
     @observable isAuthorize: boolean = false;
@@ -15,13 +15,18 @@ class AppStore {
         return this.getValue('userId') || '';
     }
 
+    @computed
+    public get isExecutor(): boolean {
+        return this.getValue('isExecutor') === 'true';
+    }
+
     @action
-    setValue(key: string, value: string) {
+    setValue(key: any, value: any) {
         window.localStorage.setItem(key, value);
     }
 
     @action
-    getValue(key: string): string | null {
+    getValue(key: string): any | null {
         const value = window.localStorage.getItem(key);
         return value ? value : null;
     }
@@ -31,6 +36,7 @@ class AppStore {
         window.localStorage.removeItem('token');
         window.localStorage.removeItem('userName');
         window.localStorage.removeItem('userId');
+        window.localStorage.removeItem('isExecutor');
     }
 }
 
