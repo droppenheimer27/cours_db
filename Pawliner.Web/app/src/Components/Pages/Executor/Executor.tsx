@@ -1,22 +1,26 @@
 import React from 'react';
 import { observer } from 'mobx-react';
-import { observable } from 'mobx';
+import { observable, action } from 'mobx';
 import { Button } from 'react-bootstrap';
 
 import ApiService from '../../../Services/ApiService';
 import { ApiUrls } from '../../../AppConstants';
 
 import ExecutorModel from '../../../Models/ExecutorModel';
-import CommentModel from '../../../Models/CommentModel';
+import { appStore } from '../../../Stores/AppStore';
+import { modalStore } from '../../../Stores/ModalStore';
+
+import CommentDialog from '../../Dialogs/CommentDialog';
+import EditCommentDialog from '../../Dialogs/EditCommentDialog';
+import { commentsStore } from '../../../Stores/CommentsStore';
 
 interface IExecutorProps {
-    match: any
+    match: any;
 }
 
 @observer
 export default class Executor extends React.Component<IExecutorProps, {}> {
     @observable executor: ExecutorModel | null = null;
-    @observable comments: CommentModel[] = [];
 
     constructor(props: any) {
         super(props);
@@ -26,62 +30,122 @@ export default class Executor extends React.Component<IExecutorProps, {}> {
 
     render() {
         let services: any[] = [];
-        if (this.executor) services = this.executor.serviceClassiferDescription.split(',');
+        if (this.executor)
+            services = this.executor.serviceClassiferDescription.split(',');
         return (
             <React.Fragment>
-                {this.executor && <div className="row" style={{backgroundColor: '#ffffff', margin: '5rem', display: 'flex', justifyContent: 'center', padding: '5rem'}}>
-                    <div className="box">
-                        <div className="row">
-                            <h2><b>{this.executor.firstName + ' ' + this.executor.lastName}</b></h2> 
-                        </div>
-                        <div className="row">
-                           
-                        </div>
-                        <div className="box-body">
-                            <hr/>
-                            <div className="row" style={{marginLeft: '5rem', marginBottom: '5rem'}}>
-                                <div className="col">
-                                    <p>{this.executor.description}</p>
-                                </div>
-                                <div className="col col-lg-2">
-                                    <ul>
-                                        Services
-                                        {(services || []).map((service: any, index: number) => {
-                                            return <li key={index}>{service}</li>; 
-                                        })}
-                                    </ul>
+                {this.executor && (
+                    <div
+                        className="row"
+                        style={{
+                            backgroundColor: '#ffffff',
+                            margin: '5rem',
+                            display: 'flex',
+                            justifyContent: 'center',
+                            padding: '5rem'
+                        }}
+                    >
+                        <div className="box">
+                            <div className="row">
+                                <h2>
+                                    <b>
+                                        {this.executor.firstName +
+                                            ' ' +
+                                            this.executor.lastName}
+                                    </b>
+                                </h2>
+                            </div>
+                            <div className="row" />
+                            <div className="box-body">
+                                <hr />
+                                <div
+                                    className="row"
+                                    style={{
+                                        marginLeft: '5rem',
+                                        marginBottom: '5rem'
+                                    }}
+                                >
+                                    <div className="col">
+                                        <p>{this.executor.description}</p>
+                                    </div>
+                                    <div className="col col-lg-2">
+                                        <ul>
+                                            Services
+                                            {(services || []).map(
+                                                (
+                                                    service: any,
+                                                    index: number
+                                                ) => {
+                                                    return (
+                                                        <li key={index}>
+                                                            {service}
+                                                        </li>
+                                                    );
+                                                }
+                                            )}
+                                        </ul>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                        <div className="box-footer">
-                            <div className="row">
-                                <div className="col">
-                                </div>
-                                <div className="pull-right">
-                                    <Button type="button" variant="primary">Leave a comment</Button>
+                            <div className="box-footer">
+                                <div className="row">
+                                    <div className="col" />
+                                    {appStore.isAuthorize && (
+                                        <div className="pull-right">
+                                            <Button
+                                                type="button"
+                                                variant="primary"
+                                                onClick={this.openCommentDialog}
+                                            >
+                                                Leave a comment
+                                            </Button>
+                                        </div>
+                                    )}
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div>}
+                )}
                 <hr />
-                {(this.comments || []).map((comment, index) => {
+                {(commentsStore.comments || []).map((comment, index) => {
                     return (
-                        <div key={comment.id + index} className="row" style={{backgroundColor: '#ffffff', marginTop: '3rem', marginLeft: '20rem', marginRight: '20rem', display: 'flex', justifyContent: 'flex-start', padding: '2rem'}}>
+                        <div
+                            key={comment.id + index}
+                            className="row"
+                            style={{
+                                backgroundColor: '#ffffff',
+                                marginTop: '3rem',
+                                marginLeft: '20rem',
+                                marginRight: '20rem',
+                                display: 'flex',
+                                justifyContent: 'flex-start',
+                                padding: '2rem'
+                            }}
+                        >
                             <div className="box">
                                 <div className="row">
-                                    <div className="col text-white">
-                                        <h5><a className="text-orange" href="#!/main/executor/<%= Executor.Id %>">{comment.userName}</a></h5>
+                                    <div className="col text-primary">
+                                        <h5>{comment.userName}</h5>
                                     </div>
-                                    {/* <div className="col">
-                                        <% if (Executor.UserId === window.app.model.get('userId')) { %>
-                                            <a className="text-white pull-right edit-respond" href="" style="margin-right: 80px;">Edit a respond</a>
-                                        <% } %>
-                                        <% if (Order.UserId === window.app.model.get('userId')) { %>
-                                            <a className="text-white pull-right submit-respond" href="" style="margin-right: 80px;">Submit</a>
-                                        <% } %>
-                                    </div> */}
-                                    </div>
+                                    {comment.userId ===
+                                        appStore.currentUserId && (
+                                        <div className="col">
+                                            <Button
+                                                className="pull-right"
+                                                variant="warning"
+                                                onClick={() =>
+                                                    this.openEditCommentDialog(
+                                                        comment.id,
+                                                        comment.content
+                                                    )
+                                                }
+                                            >
+                                                Edit
+                                            </Button>
+                                        </div>
+                                    )}
+                                </div>
+                                <hr />
                                 <div className="box-body">
                                     <div className="row">
                                         <div className="col">
@@ -90,7 +154,11 @@ export default class Executor extends React.Component<IExecutorProps, {}> {
                                     </div>
                                     <div className="row">
                                         <div className="col">
-                                            <p><small className="text-muted">{comment.createdAt}</small></p>
+                                            <p>
+                                                <small className="text-muted">
+                                                    {comment.createdAt}
+                                                </small>
+                                            </p>
                                         </div>
                                     </div>
                                 </div>
@@ -99,11 +167,31 @@ export default class Executor extends React.Component<IExecutorProps, {}> {
                     );
                 })}
             </React.Fragment>
-        )
+        );
     }
 
     async loadData() {
-        this.executor = await ApiService.getData(ApiUrls.ExecutorsUrl + '/' + this.props.match.params.id);
-        this.comments = await ApiService.getData(ApiUrls.CommentsUrl + '/' + this.props.match.params.id);
+        this.executor = await ApiService.getData(
+            ApiUrls.ExecutorsUrl + '/' + this.props.match.params.id
+        );
+        commentsStore.comments = await ApiService.getData(
+            ApiUrls.CommentsUrl + '/' + this.props.match.params.id
+        );
     }
+
+    @action
+    openCommentDialog = () => {
+        modalStore.showModal(
+            <CommentDialog executorId={this.props.match.params.id} />,
+            'Leave a comment'
+        );
+    };
+
+    @action
+    openEditCommentDialog = (id: number, content: string) => {
+        modalStore.showModal(
+            <EditCommentDialog commentId={id} content={content} />,
+            'Edit a comment'
+        );
+    };
 }

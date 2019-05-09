@@ -57,7 +57,8 @@ namespace Pawliner.Web.Controllers
                     var response = new
                     {
                         token = encodedJwt,
-                        userName = identity.Name
+                        userName = identity.Name,
+                        userId = user.Id
                     };
 
                     return Ok(JsonConvert.SerializeObject(response, new JsonSerializerSettings { Formatting = Formatting.Indented }));

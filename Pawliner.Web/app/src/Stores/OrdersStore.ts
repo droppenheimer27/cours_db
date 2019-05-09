@@ -1,9 +1,9 @@
-import { observable } from 'mobx';
+import { observable } from "mobx";
 
-import OrderModel from '../Models/OrderModel';
+import OrderModel from "../Models/OrderModel";
 
 class OrdersStore {
-    @observable orders: OrderModel[] = [];
+  @observable orders: OrderModel[] = [];
 }
 
-export const ordersStore = new OrdersStore(); 
+export const ordersStore = new OrdersStore();

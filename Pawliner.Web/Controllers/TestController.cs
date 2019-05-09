@@ -7,7 +7,6 @@ namespace Pawliner.Web.Controllers
     [ApiController]
     public class TestController : ControllerBase
     {
-        [Authorize]
         [HttpGet("ping")]
         public ActionResult<string> Ping()
         {

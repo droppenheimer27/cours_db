@@ -1,4 +1,4 @@
-import { observable, computed, action } from 'mobx';
+import { observable, action } from 'mobx';
 
 class AppStore {
     @observable isAuthorize: boolean = false;
@@ -11,10 +11,9 @@ class AppStore {
         return this.getValue('userName') || '';
     }
 
-    // @computed
-    // get isAuthorize(): boolean {
-    //     return !!(this.currentToken && this.currentUser);
-    // }
+    public get currentUserId(): string {
+        return this.getValue('userId') || '';
+    }
 
     @action
     setValue(key: string, value: string) {
@@ -31,6 +30,7 @@ class AppStore {
     clearUserData() {
         window.localStorage.removeItem('token');
         window.localStorage.removeItem('userName');
+        window.localStorage.removeItem('userId');
     }
 }
 
