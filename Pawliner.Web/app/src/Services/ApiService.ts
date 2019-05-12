@@ -2,7 +2,7 @@ import axios from 'axios';
 import { appStore } from '../Stores/AppStore';
 
 export interface ParamsModel {
-    filter?: string;
+    filter?: string | null;
     search?: string;
 }
 

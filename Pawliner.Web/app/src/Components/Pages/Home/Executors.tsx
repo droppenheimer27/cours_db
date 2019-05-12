@@ -1,5 +1,5 @@
 import React from 'react';
-import { Image } from 'react-bootstrap';
+import { Card, Image } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import { observer } from 'mobx-react';
 
@@ -23,65 +23,73 @@ export default class Executors extends React.Component<{}, {}> {
                 let picture = '';
                 if (executor.path) picture = executor.path.replace(regex, '\\');
                 return (
-                    <div key={executor.id + index} className="col-md-9">
-                        <div className="box">
-                            <div className="box-header">
-                                <h3 className="box-title">
-                                    <Link to={'executors/' + executor.id}>
-                                        <b>
-                                            {executor.firstName +
-                                                ' ' +
-                                                executor.lastName}
-                                        </b>
-                                    </Link>
-                                </h3>
-                            </div>
-                            <div className="box-body">
-                                <div className="row container">
-                                    <div className="col-2">
-                                        {!executor.fileName && (
-                                            <img
-                                                className="img-thumbnail"
-                                                src="http://www.independentmediators.co.uk/wp-content/uploads/2016/02/placeholder-image.jpg"
-                                                alt=""
-                                            />
-                                        )}
-                                        {executor.fileName && (
-                                            <Image
-                                                className="img-thumbnail"
-                                                src={Paths.ImgPath + picture}
-                                                alt=""
-                                            />
-                                        )}
+                    <div
+                        key={executor.id + index}
+                        className="col-md-9"
+                        style={{ marginTop: '2rem', marginBottom: '1rem' }}
+                    >
+                        <Card>
+                            <Card.Header>
+                                <Link to={'executors/' + executor.id}>
+                                    <b>
+                                        {executor.firstName +
+                                            ' ' +
+                                            executor.lastName}
+                                    </b>
+                                </Link>
+                            </Card.Header>
+                            <Card.Body>
+                                <Card.Text>
+                                    <div className="row">
+                                        <div className="col-2">
+                                            {!executor.fileName && (
+                                                <img
+                                                    className="img-thumbnail"
+                                                    src="http://www.independentmediators.co.uk/wp-content/uploads/2016/02/placeholder-image.jpg"
+                                                    alt=""
+                                                />
+                                            )}
+                                            {executor.fileName && (
+                                                <Image
+                                                    className="img-thumbnail"
+                                                    src={
+                                                        Paths.ImgPath + picture
+                                                    }
+                                                    alt=""
+                                                />
+                                            )}
+                                        </div>
+                                        <div className="col-lg-5">
+                                            <p
+                                                id="description"
+                                                style={{
+                                                    whiteSpace: 'nowrap',
+                                                    overflow: 'hidden',
+                                                    textOverflow: 'ellipsis',
+                                                    wordWrap: 'break-word'
+                                                }}
+                                            >
+                                                {executor.description}
+                                            </p>
+                                        </div>
                                     </div>
-                                    <div className="col-lg-5">
-                                        <p
-                                            id="description"
-                                            style={{
-                                                whiteSpace: 'nowrap',
-                                                overflow: 'hidden',
-                                                textOverflow: 'ellipsis',
-                                                wordWrap: 'break-word'
-                                            }}
-                                        >
-                                            {executor.description}
-                                        </p>
+                                    <hr />
+                                    <div
+                                        className="row"
+                                        style={{ marginTop: '.4rem' }}
+                                    >
+                                        <div className="col">
+                                            <p className="text-muted">
+                                                Service -{' '}
+                                                {
+                                                    executor.serviceClassiferDescription
+                                                }
+                                            </p>
+                                        </div>
                                     </div>
-                                </div>
-                            </div>
-                            <div className="box-footer">
-                                <div className="row">
-                                    <div className="col">
-                                        <p className="text-muted">
-                                            Service -{' '}
-                                            {
-                                                executor.serviceClassiferDescription
-                                            }
-                                        </p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                                </Card.Text>
+                            </Card.Body>
+                        </Card>
                     </div>
                 );
             }

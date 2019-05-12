@@ -87,13 +87,14 @@ export default class EditCommentDialog extends React.Component<
         ApiService.deleteData(ApiUrls.CommentsUrl, {
             id: this.props.commentId
         }).then((id: number) => {
-            const index = commentsStore.comments.map(
+            commentsStore.comments.map(
                 (element: CommentModel, index: number) => {
                     if (element.id === id) {
                         commentsStore.comments.splice(index, 1);
                     }
                 }
             );
+
             modalStore.closeModal();
         });
     };

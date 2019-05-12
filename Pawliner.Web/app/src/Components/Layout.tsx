@@ -1,9 +1,10 @@
 import React from 'react';
-import { Switch, Route } from 'react-router-dom'
+import { Switch, Route } from 'react-router-dom';
 
 import ModalDialogContainer from './ModalDialogContainer';
 import Home from './Pages/Home/Home';
 import Order from './Pages/Order/Order';
+import CreateOrder from './Pages/Order/CreateOrder';
 import Executor from './Pages/Executor/Executor';
 
 export default class Layout extends React.Component<{}, {}> {
@@ -12,9 +13,10 @@ export default class Layout extends React.Component<{}, {}> {
             <React.Fragment>
                 <ModalDialogContainer />
                 <Switch>
-                    <Route exact path='/' component={Home}/>
-                    <Route path='/orders/:id' component={Order}/>
-                    <Route path='/executors/:id' component={Executor}/>
+                    <Route exact path="/" component={Home} />
+                    <Route path="/orders/:id" component={Order} />
+                    <Route path="/place-order" component={CreateOrder} />
+                    <Route path="/executors/:id" component={Executor} />
                 </Switch>
             </React.Fragment>
         );
