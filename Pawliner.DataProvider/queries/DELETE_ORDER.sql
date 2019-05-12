@@ -1,0 +1,12 @@
+USE [Pawliner];
+
+CREATE PROCEDURE [dbo].[DELETE_ORDER]
+	@id AS INT
+AS
+BEGIN
+	DELETE [dbo].[Orders]
+	WHERE [Id] = @id;
+END;
+
+DROP PROCEDURE [dbo].[DELETE_ORDER];
+

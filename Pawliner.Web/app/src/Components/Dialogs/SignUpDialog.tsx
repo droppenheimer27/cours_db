@@ -1,16 +1,16 @@
-import React from "react";
-import { observer } from "mobx-react";
-import { observable, action } from "mobx";
-import { Form, Button } from "react-bootstrap";
+import React from 'react';
+import { observer } from 'mobx-react';
+import { observable, action } from 'mobx';
+import { Form, Button } from 'react-bootstrap';
 
-import { modalStore } from "../../Stores/ModalStore";
-import ApiService from "../../Services/ApiService";
-import { ApiUrls } from "../../AppConstants";
+import { modalStore } from '../../Stores/ModalStore';
+import ApiService from '../../Services/ApiService';
+import { ApiUrls } from '../../AppConstants';
 
 @observer
 export default class SignUpDialog extends React.Component<{}, {}> {
-    @observable userName: string = "";
-    @observable password: string = "";
+    @observable userName: string = '';
+    @observable password: string = '';
 
     render() {
         return (

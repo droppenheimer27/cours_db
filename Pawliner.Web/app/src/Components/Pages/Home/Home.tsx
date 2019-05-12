@@ -62,7 +62,7 @@ export default class Home extends React.Component<
                                     }
                                 />
                             )}
-                            {appStore.isAuthorize && appStore.isExecutor && (
+                            {appStore.isAuthorize && !appStore.isExecutor && (
                                 <Tab
                                     eventKey="become-executor"
                                     title={

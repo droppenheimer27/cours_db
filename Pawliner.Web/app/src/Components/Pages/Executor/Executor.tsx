@@ -7,12 +7,14 @@ import ApiService from '../../../Services/ApiService';
 import { ApiUrls } from '../../../AppConstants';
 
 import ExecutorModel from '../../../Models/ExecutorModel';
+
 import { appStore } from '../../../Stores/AppStore';
 import { modalStore } from '../../../Stores/ModalStore';
+import { commentsStore } from '../../../Stores/CommentsStore';
 
 import CommentDialog from '../../Dialogs/CommentDialog';
 import EditCommentDialog from '../../Dialogs/EditCommentDialog';
-import { commentsStore } from '../../../Stores/CommentsStore';
+import EditExecutorProfileDialog from '../../Dialogs/EditExecutorProfileDialog';
 
 interface IExecutorProps {
     match: any;
@@ -47,13 +49,30 @@ export default class Executor extends React.Component<IExecutorProps, {}> {
                     >
                         <div className="box">
                             <div className="row">
-                                <h2>
-                                    <b>
-                                        {this.executor.firstName +
-                                            ' ' +
-                                            this.executor.lastName}
-                                    </b>
-                                </h2>
+                                <div className="col">
+                                    <h2>
+                                        <b>
+                                            {this.executor.firstName +
+                                                ' ' +
+                                                this.executor.lastName}
+                                        </b>
+                                    </h2>
+                                </div>
+                                {appStore.isAuthorize &&
+                                    appStore.currentUserId ===
+                                        this.executor.userId && (
+                                        <div className="col">
+                                            <Button
+                                                variant="warning"
+                                                onClick={
+                                                    this
+                                                        .openEditExecutorProfileDialog
+                                                }
+                                            >
+                                                Edit profile
+                                            </Button>
+                                        </div>
+                                    )}
                             </div>
                             <div className="row" />
                             <div className="box-body">
@@ -90,17 +109,21 @@ export default class Executor extends React.Component<IExecutorProps, {}> {
                             <div className="box-footer">
                                 <div className="row">
                                     <div className="col" />
-                                    {appStore.isAuthorize && (
-                                        <div className="pull-right">
-                                            <Button
-                                                type="button"
-                                                variant="primary"
-                                                onClick={this.openCommentDialog}
-                                            >
-                                                Leave a comment
-                                            </Button>
-                                        </div>
-                                    )}
+                                    {appStore.isAuthorize &&
+                                        this.executor.userId !==
+                                            appStore.currentUserId && (
+                                            <div className="pull-right">
+                                                <Button
+                                                    type="button"
+                                                    variant="primary"
+                                                    onClick={
+                                                        this.openCommentDialog
+                                                    }
+                                                >
+                                                    Leave a comment
+                                                </Button>
+                                            </div>
+                                        )}
                                 </div>
                             </div>
                         </div>
@@ -179,7 +202,6 @@ export default class Executor extends React.Component<IExecutorProps, {}> {
         );
     }
 
-    @action
     openCommentDialog = () => {
         modalStore.showModal(
             <CommentDialog executorId={this.props.match.params.id} />,
@@ -187,11 +209,17 @@ export default class Executor extends React.Component<IExecutorProps, {}> {
         );
     };
 
-    @action
     openEditCommentDialog = (id: number, content: string) => {
         modalStore.showModal(
             <EditCommentDialog commentId={id} content={content} />,
             'Edit a comment'
+        );
+    };
+
+    openEditExecutorProfileDialog = () => {
+        modalStore.showModal(
+            <EditExecutorProfileDialog executor={this.executor} />,
+            'Edit executor profile'
         );
     };
 }

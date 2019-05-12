@@ -24,7 +24,9 @@ namespace Pawliner.Web.Controllers
         [HttpGet]
         public IEnumerable<Executor> Get(string search = "", string filter = "")
         {
-            var executors = _database.Executors.FromSql("dbo.GET_EXECUTORS @search, @filter", new SqlParameter("@search", search), new SqlParameter("@filter", filter));
+            var executors = _database.Executors.FromSql("dbo.GET_EXECUTORS @search, @filter", 
+                new SqlParameter("@search", search), 
+                new SqlParameter("@filter", filter));
             return executors;
         }
 
@@ -37,10 +39,52 @@ namespace Pawliner.Web.Controllers
 
         [Authorize]
         [HttpPost]
-        public async Task<Executor> Post(ExecutorViewModel model)
+        public async Task<IActionResult> Post(ExecutorViewModel model)
         {
-            var executor = await _database.Executors.FromSql("dbo.GET_EXECUTOR @id", new SqlParameter("@id", 0)).FirstAsync();
-            return executor;
+            if (ModelState.IsValid)
+            {
+                await _database.Database.ExecuteSqlCommandAsync("dbo.INSERT_EXECUTOR @firstName, " +
+                    "@lastName, " +
+                    "@patronymic, " +
+                    "@description, " +
+                    "@executorType, " +
+                    "@userId, " +
+                    "@phoneNumber, " +
+                    "@payerAccountNumber, " +
+                    "@fullJuridicalName, " +
+                    "@shortJuridicalName, " +
+                    "@servicesId", 
+                    new SqlParameter("@firstName", model.FirstName),
+                    new SqlParameter("@lastName", model.LastName),
+                    new SqlParameter("@patronymic", model.Patronymic),
+                    new SqlParameter("@description", model.Description),
+                    new SqlParameter("@executorType", model.ExecutorType),
+                    new SqlParameter("@userId", model.UserId),
+                    new SqlParameter("@phoneNumber", model.Number),
+                    new SqlParameter("@payerAccountNumber", model.PayerAccountNumber),
+                    new SqlParameter("@fullJuridicalName", model.FullJuridicalName),
+                    new SqlParameter("@shortJuridicalName", model.ShortJuridicalName),
+                    new SqlParameter("@servicesId", model.ServicesId));
+
+                return Ok(model);
+            }
+
+            return BadRequest();
+        }
+
+        [Authorize]
+        [HttpDelete]
+        public async Task<IActionResult> Delete(int id)
+        {
+            if (ModelState.IsValid)
+            {
+                await _database.Database.ExecuteSqlCommandAsync("dbo.DELETE_EXECUTOR @id",
+                    new SqlParameter("@id", id));
+
+                return Ok(id);
+            }
+
+            return BadRequest();
         }
     }
 }

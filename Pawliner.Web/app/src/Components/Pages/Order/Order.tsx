@@ -9,6 +9,10 @@ import { ApiUrls } from '../../../AppConstants';
 
 import OrderModel from '../../../Models/OrderModel';
 import RespondModel from '../../../Models/RespondModel';
+import { appStore } from '../../../Stores/AppStore';
+import { modalStore } from '../../../Stores/ModalStore';
+
+import EditOrderDialog from '../../Dialogs/EditOrderDialog';
 
 interface IOrderProps {
     match: any;
@@ -41,9 +45,25 @@ export default class Order extends React.Component<IOrderProps, {}> {
                     >
                         <div className="box">
                             <div className="row">
-                                <h2>
-                                    <b>{this.order.header}</b>
-                                </h2>
+                                <div className="col">
+                                    <h2>
+                                        <b>{this.order.header}</b>
+                                    </h2>
+                                </div>
+                                {appStore.isAuthorize &&
+                                    appStore.currentUserId ===
+                                        this.order.userId && (
+                                        <div className="col">
+                                            <Button
+                                                variant="warning"
+                                                onClick={
+                                                    this.openEditOrderDialog
+                                                }
+                                            >
+                                                Edit order
+                                            </Button>
+                                        </div>
+                                    )}
                             </div>
                             <div className="row">
                                 {this.order.status === 0 && <h5>Active</h5>}
@@ -101,11 +121,18 @@ export default class Order extends React.Component<IOrderProps, {}> {
                                             {this.order.completedOn}{' '}
                                         </p>
                                     </div>
-                                    <div className="pull-right">
-                                        <Button type="button" variant="primary">
-                                            Leave a respond
-                                        </Button>
-                                    </div>
+                                    {appStore.isAuthorize &&
+                                        appStore.currentUserId !==
+                                            this.order.userId && (
+                                            <div className="pull-right">
+                                                <Button
+                                                    type="button"
+                                                    variant="primary"
+                                                >
+                                                    Leave a respond
+                                                </Button>
+                                            </div>
+                                        )}
                                 </div>
                             </div>
                         </div>
@@ -187,4 +214,11 @@ export default class Order extends React.Component<IOrderProps, {}> {
             ApiUrls.RespondsUrl + '/' + this.props.match.params.id
         );
     }
+
+    openEditOrderDialog = () => {
+        modalStore.showModal(
+            <EditOrderDialog order={this.order} />,
+            'Edit order'
+        );
+    };
 }

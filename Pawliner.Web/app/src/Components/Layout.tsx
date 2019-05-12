@@ -6,6 +6,7 @@ import Home from './Pages/Home/Home';
 import Order from './Pages/Order/Order';
 import CreateOrder from './Pages/Order/CreateOrder';
 import Executor from './Pages/Executor/Executor';
+import CreateExecutorProfile from './Pages/Executor/CreateExecutorProfile';
 
 export default class Layout extends React.Component<{}, {}> {
     render() {
@@ -17,6 +18,10 @@ export default class Layout extends React.Component<{}, {}> {
                     <Route path="/orders/:id" component={Order} />
                     <Route path="/place-order" component={CreateOrder} />
                     <Route path="/executors/:id" component={Executor} />
+                    <Route
+                        path="/become-executor"
+                        component={CreateExecutorProfile}
+                    />
                 </Switch>
             </React.Fragment>
         );

@@ -1,0 +1,13 @@
+USE [Pawliner];
+
+CREATE PROCEDURE [dbo].[DELETE_COMMENT]
+	@id AS INT
+AS
+BEGIN
+	DELETE [dbo].[Comments]
+	WHERE [Id] = @id;
+END;
+
+DROP PROCEDURE [dbo].[DELETE_COMMENT];
+
+EXECUTE [dbo].[DELETE_COMMENT] 85;
