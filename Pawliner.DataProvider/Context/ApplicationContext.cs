@@ -8,6 +8,7 @@ namespace Pawliner.DataProvider.Context
         public DbSet<AspNetUser> AspNetUsers { get; set; }
         public DbSet<Order> Orders { get; set; }
         public DbSet<Executor> Executors { get; set; }
+        public DbSet<Service> Services { get; set; }
         public DbSet<Respond> Responds { get; set; }
         public DbSet<Comment> Comments { get; set; }
 
