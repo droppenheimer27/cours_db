@@ -396,7 +396,7 @@ export default class CreateExecutorProfile extends React.Component<
         };
 
         ApiService.postData(ApiUrls.ExecutorsUrl, data).then(() => {
-            appStore.setValue('isExecutor', 'true');
+            appStore.clearUserData();
             document.location.replace('/');
         });
     }

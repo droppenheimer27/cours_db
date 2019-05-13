@@ -38,8 +38,10 @@ export default class EditExecutorProfileDialog extends React.Component<
         super(props);
 
         this.state = {
-            services: this.props.executor.services,
-            servicesId: this.props.executor.servicesId,
+            services: this.props.executor.serviceClassiferDescription.split(
+                ', '
+            ),
+            servicesId: [],
             firstName: this.props.executor.firstName,
             lastName: this.props.executor.lastName,
             patronymic: this.props.executor.patronymic,
@@ -123,7 +125,6 @@ export default class EditExecutorProfileDialog extends React.Component<
                         name="service"
                         as="select"
                         multiple
-                        required
                         onChange={(event: any) => this.handleInputChange(event)}
                     >
                         {(this.services || []).map(
@@ -288,6 +289,26 @@ export default class EditExecutorProfileDialog extends React.Component<
     loadData() {
         ApiService.getData(ApiUrls.ServicesUrl).then(response => {
             this.services = response;
+
+            this.services.map((serviceClassifer: any, index: number) => {
+                const services = serviceClassifer.servicesDescriptions.split(
+                    ','
+                );
+
+                services.map((service: any, index: number) => {
+                    if (service.length === 0) services.splice(index, 1);
+
+                    const serviceInfo = service.split('---');
+                    const id = serviceInfo[0];
+                    const description = serviceInfo[1];
+
+                    this.state.services.forEach(value => {
+                        if (value === description) {
+                            this.state.servicesId.push(id);
+                        }
+                    });
+                });
+            });
         });
     }
 
@@ -371,6 +392,7 @@ export default class EditExecutorProfileDialog extends React.Component<
         event.preventDefault();
 
         const data = {
+            id: this.props.executor.id,
             servicesId: this.state.servicesId.join(', '),
             firstName: this.state.firstName,
             lastName: this.state.lastName,
@@ -380,33 +402,32 @@ export default class EditExecutorProfileDialog extends React.Component<
             payerAccountNumber: this.state.payerAccountNumber,
             fullJuridicalName: this.state.fullJuridicalName,
             shortJuridicalName: this.state.shortJuridicalName,
-            executorType: this.state.executorType,
-            userId: appStore.currentUserId
+            executorType: this.state.executorType
         };
 
-        // ApiService.putData(ApiUrls.ExecutorsUrl, data).then((response: any) => {
-        //     // this.props.executor.services = response.service;
-        //     // this.props.executor.header = response.header;
-        //     // this.props.executor.description = response.description;
-        //     // this.props.executor.address = response.address;
-        //     // this.props.executor.city = response.city;
-        //     // this.props.executor.name = response.name;
-        //     // this.props.executor.completedOn = response.completedOn;
-        //     // this.props.executor.price = response.price;
-        //     // this.props.executor.number = response.number;
-        //     console.log(response);
+        ApiService.putData(ApiUrls.ExecutorsUrl, data).then(() => {
+            this.props.executor.serviceClassiferDescription = this.state.services.join(
+                ','
+            );
+            this.props.executor.firstName = this.state.firstName;
+            this.props.executor.lastName = this.state.lastName;
+            this.props.executor.patronymic = this.state.patronymic;
+            this.props.executor.description = this.state.description;
+            this.props.executor.phoneNumber = this.state.phoneNumber;
+            this.props.executor.payerAccountNumber = this.state.payerAccountNumber;
+            this.props.executor.fullJuridicalName = this.state.fullJuridicalName;
+            this.props.executor.shortJuridicalName = this.state.shortJuridicalName;
+            this.props.executor.executorType = this.state.executorType;
 
-        //     modalStore.closeModal();
-        // });
-
-        console.log(data);
+            modalStore.closeModal();
+        });
     }
 
     removeExecutorProfile = () => {
         ApiService.deleteData(ApiUrls.ExecutorsUrl, {
             id: this.props.executor.id
         }).then(() => {
-            appStore.setValue('isExecutor', 'false');
+            appStore.setValue('executorId', '');
 
             modalStore.closeModal();
             document.location.replace('/ ');

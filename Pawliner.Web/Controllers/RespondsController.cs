@@ -35,9 +35,10 @@ namespace Pawliner.Web.Controllers
         {
             if (ModelState.IsValid)
             {
-                await _database.Database.ExecuteSqlCommandAsync("dbo.INSERT_RESPOND @content, @executorId",
+                await _database.Database.ExecuteSqlCommandAsync("dbo.INSERT_RESPOND @content, @orderId, @executorId",
                     new SqlParameter("@content", model.Content),
-                    new SqlParameter("@executorId", model.ExecutorId));
+                    new SqlParameter("@executorId", model.ExecutorId),
+                    new SqlParameter("@orderId", model.OrderId));
 
                 return Ok(model);
             }

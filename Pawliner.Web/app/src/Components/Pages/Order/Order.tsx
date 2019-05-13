@@ -10,9 +10,12 @@ import { ApiUrls } from '../../../AppConstants';
 import OrderModel from '../../../Models/OrderModel';
 import RespondModel from '../../../Models/RespondModel';
 import { appStore } from '../../../Stores/AppStore';
+import { respondsStore } from '../../../Stores/RespondsStore';
 import { modalStore } from '../../../Stores/ModalStore';
 
 import EditOrderDialog from '../../Dialogs/EditOrderDialog';
+import RespondDialog from '../../Dialogs/RespondDialog';
+import EditRespondDialog from '../../Dialogs/EditRespondDialog';
 
 interface IOrderProps {
     match: any;
@@ -122,12 +125,16 @@ export default class Order extends React.Component<IOrderProps, {}> {
                                         </p>
                                     </div>
                                     {appStore.isAuthorize &&
+                                        appStore.isExecutor &&
                                         appStore.currentUserId !==
                                             this.order.userId && (
                                             <div className="pull-right">
                                                 <Button
                                                     type="button"
                                                     variant="primary"
+                                                    onClick={
+                                                        this.openRespondDialog
+                                                    }
                                                 >
                                                     Leave a respond
                                                 </Button>
@@ -139,8 +146,8 @@ export default class Order extends React.Component<IOrderProps, {}> {
                     </div>
                 )}
                 <hr />
-                {(this.responds || []).map(
-                    (respond: RespondModel, index: number) => {
+                {(respondsStore.responds || []).map(
+                    (respond: any, index: number) => {
                         return (
                             <div
                                 key={respond.id + index}
@@ -172,14 +179,22 @@ export default class Order extends React.Component<IOrderProps, {}> {
                                                 </Link>
                                             </h5>
                                         </div>
-                                        {/* <div className="col">
-                                        <% if (Executor.UserId === window.app.model.get('userId')) { %>
-                                            <a className="text-white pull-right edit-respond" href="" style="margin-right: 80px;">Edit a respond</a>
-                                        <% } %>
-                                        <% if (Order.UserId === window.app.model.get('userId')) { %>
-                                            <a className="text-white pull-right submit-respond" href="" style="margin-right: 80px;">Submit</a>
-                                        <% } %>
-                                    </div> */}
+                                        <div className="col">
+                                            {
+                                                <Button
+                                                    className="pull-right"
+                                                    variant="warning"
+                                                    onClick={() =>
+                                                        this.openEditRespondDialog(
+                                                            respond
+                                                        )
+                                                    }
+                                                >
+                                                    Edit a respond
+                                                </Button>
+                                            }
+                                            {/* <a className="text-white pull-right submit-respond" href="" style="margin-right: 80px;">Submit</a> */}
+                                        </div>
                                     </div>
                                     <div className="box-body">
                                         <div className="row">
@@ -210,7 +225,8 @@ export default class Order extends React.Component<IOrderProps, {}> {
         this.order = await ApiService.getData(
             ApiUrls.OrdersUrl + '/' + this.props.match.params.id
         );
-        this.responds = await ApiService.getData(
+
+        respondsStore.responds = await ApiService.getData(
             ApiUrls.RespondsUrl + '/' + this.props.match.params.id
         );
     }
@@ -219,6 +235,24 @@ export default class Order extends React.Component<IOrderProps, {}> {
         modalStore.showModal(
             <EditOrderDialog order={this.order} />,
             'Edit order'
+        );
+    };
+
+    openRespondDialog = () => {
+        if (!this.order) return;
+
+        modalStore.showModal(
+            <RespondDialog orderId={this.order.id} />,
+            'Leave respond'
+        );
+    };
+
+    openEditRespondDialog = (respond: any) => {
+        if (!this.order) return;
+
+        modalStore.showModal(
+            <EditRespondDialog respond={respond} />,
+            'Leave respond'
         );
     };
 }

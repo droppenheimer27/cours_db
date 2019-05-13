@@ -163,7 +163,7 @@ export default class Header extends React.Component<{}, {}> {
                 appStore.setValue('token', 'Bearer ' + response.token);
                 appStore.setValue('userName', response.userName);
                 appStore.setValue('userId', response.userId);
-                appStore.setValue('isExecutor', response.isExecutor);
+                appStore.setValue('executorId', response.executorId);
 
                 appStore.isAuthorize = true;
             }

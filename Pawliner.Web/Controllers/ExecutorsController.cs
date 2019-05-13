@@ -73,6 +73,41 @@ namespace Pawliner.Web.Controllers
         }
 
         [Authorize]
+        [HttpPut]
+        public async Task<IActionResult> Put(EditExecutorViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                await _database.Database.ExecuteSqlCommandAsync("dbo.UPDATE_EXECUTOR @id, " +
+                    "@firstName, " +
+                    "@lastName, " +
+                    "@patronymic, " +
+                    "@description, " +
+                    "@executorType, " +
+                    "@phoneNumber, " +
+                    "@payerAccountNumber, " +
+                    "@fullJuridicalName, " +
+                    "@shortJuridicalName, " +
+                    "@servicesId",
+                    new SqlParameter("@id", model.Id),
+                    new SqlParameter("@firstName", model.FirstName),
+                    new SqlParameter("@lastName", model.LastName),
+                    new SqlParameter("@patronymic", model.Patronymic),
+                    new SqlParameter("@description", model.Description),
+                    new SqlParameter("@executorType", model.ExecutorType),
+                    new SqlParameter("@phoneNumber", model.Number),
+                    new SqlParameter("@payerAccountNumber", model.PayerAccountNumber),
+                    new SqlParameter("@fullJuridicalName", model.FullJuridicalName),
+                    new SqlParameter("@shortJuridicalName", model.ShortJuridicalName),
+                    new SqlParameter("@servicesId", model.ServicesId));
+
+                return Ok(model);
+            }
+
+            return BadRequest();
+        }
+
+        [Authorize]
         [HttpDelete]
         public async Task<IActionResult> Delete(int id)
         {

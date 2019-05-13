@@ -9,5 +9,6 @@ namespace Pawliner.Web.ViewModels
     {
         public string Content { get; set; }
         public int ExecutorId { get; set; }
+        public int OrderId { get; set; }
     }
 }

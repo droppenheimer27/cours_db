@@ -15,9 +15,13 @@ class AppStore {
         return this.getValue('userId') || '';
     }
 
+    public get currentExecutorId(): string {
+        return this.getValue('executorId') || '';
+    }
+
     @computed
     public get isExecutor(): boolean {
-        return this.getValue('isExecutor') === 'true';
+        return !!this.getValue('executorId');
     }
 
     @action
@@ -36,7 +40,7 @@ class AppStore {
         window.localStorage.removeItem('token');
         window.localStorage.removeItem('userName');
         window.localStorage.removeItem('userId');
-        window.localStorage.removeItem('isExecutor');
+        window.localStorage.removeItem('executorId');
     }
 }
 

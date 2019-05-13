@@ -74,7 +74,36 @@ export default class Executor extends React.Component<IExecutorProps, {}> {
                                         </div>
                                     )}
                             </div>
-                            <div className="row" />
+                            <div className="row">
+                                {this.executor.payerAccountNumber && (
+                                    <React.Fragment>
+                                        <b style={{ marginRight: '.7rem' }}>
+                                            PN:
+                                        </b>
+                                        {this.executor.payerAccountNumber}
+                                    </React.Fragment>
+                                )}
+                            </div>
+                            <div className="row">
+                                {this.executor.fullJuridicalName && (
+                                    <React.Fragment>
+                                        <b style={{ marginRight: '.7rem' }}>
+                                            Full Juridical Name:
+                                        </b>
+                                        {this.executor.fullJuridicalName}
+                                    </React.Fragment>
+                                )}
+                            </div>
+                            <div className="row">
+                                {this.executor.shortJuridicalName && (
+                                    <React.Fragment>
+                                        <b style={{ marginRight: '.7rem' }}>
+                                            Short Juridical Name:
+                                        </b>
+                                        {this.executor.shortJuridicalName}
+                                    </React.Fragment>
+                                )}
+                            </div>
                             <div className="box-body">
                                 <hr />
                                 <div

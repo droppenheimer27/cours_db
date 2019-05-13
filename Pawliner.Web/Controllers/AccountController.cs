@@ -46,7 +46,7 @@ namespace Pawliner.Web.Controllers
                     };
 
                     await _database.Database.ExecuteSqlCommandAsync("dbo.IS_EXECUTOR @userId, @id OUT", new SqlParameter("@userId", user.Id), param);
-                    var isExecutor = param.Value != DBNull.Value;
+                    var executorId = param.Value;
 
                     var identity = GetIdentity(model.UserName, model.Password);
                     if (identity == null)
@@ -70,7 +70,7 @@ namespace Pawliner.Web.Controllers
                         token = encodedJwt,
                         userName = identity.Name,
                         userId = user.Id,
-                        isExecutor
+                        executorId
                     };
 
                     return Ok(JsonConvert.SerializeObject(response, new JsonSerializerSettings { Formatting = Formatting.Indented }));
@@ -115,7 +115,7 @@ namespace Pawliner.Web.Controllers
                         token = encodedJwt,
                         userName = identity.Name,
                         userId = user.Id,
-                        isExecutor = false
+                        executorId = ""
                     };
 
                     return Ok(JsonConvert.SerializeObject(response, new JsonSerializerSettings { Formatting = Formatting.Indented }));
