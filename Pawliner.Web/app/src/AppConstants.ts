@@ -6,6 +6,8 @@ export class ApiUrls {
     public static readonly ExecutorsUrl: string = 'api/executors';
     public static readonly ServicesUrl: string = 'api/services';
     public static readonly RespondsUrl: string = 'api/responds';
+    public static readonly SubmitRespondUrl: string =
+        'api/responds/submit-respond';
     public static readonly CommentsUrl: string = 'api/comments';
 }
 

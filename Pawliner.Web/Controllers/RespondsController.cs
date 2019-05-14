@@ -52,9 +52,10 @@ namespace Pawliner.Web.Controllers
         {
             if (ModelState.IsValid)
             {
-                await _database.Database.ExecuteSqlCommandAsync("dbo.UPDATE_RESPOND @id, @content",
+                await _database.Database.ExecuteSqlCommandAsync("dbo.UPDATE_RESPOND @id, @content, @status",
                     new SqlParameter("@id", model.Id),
-                    new SqlParameter("@content", model.Content));
+                    new SqlParameter("@content", model.Content),
+                    new SqlParameter("@status", model.Status));
 
                 return Ok(model);
             }
@@ -72,6 +73,21 @@ namespace Pawliner.Web.Controllers
                     new SqlParameter("@id", id));
 
                 return Ok(id);
+            }
+
+            return BadRequest();
+        }
+
+        [Authorize]
+        [HttpPut("submit-respond")]
+        public async Task<IActionResult> SubmitRespond(SubmitRespondViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                await _database.Database.ExecuteSqlCommandAsync("dbo.SUBMIT_RESPOND @id",
+                    new SqlParameter("@id", model.Id));
+
+                return Ok(model);
             }
 
             return BadRequest();

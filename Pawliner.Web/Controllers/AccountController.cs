@@ -110,6 +110,7 @@ namespace Pawliner.Web.Controllers
 
                     var encodedJwt = new JwtSecurityTokenHandler().WriteToken(jwt);
 
+                    user = await _database.AspNetUsers.FirstOrDefaultAsync(u => u.UserName == model.UserName);
                     var response = new
                     {
                         token = encodedJwt,

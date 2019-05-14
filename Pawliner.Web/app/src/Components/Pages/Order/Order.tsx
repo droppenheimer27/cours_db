@@ -8,7 +8,6 @@ import ApiService from '../../../Services/ApiService';
 import { ApiUrls } from '../../../AppConstants';
 
 import OrderModel from '../../../Models/OrderModel';
-import RespondModel from '../../../Models/RespondModel';
 import { appStore } from '../../../Stores/AppStore';
 import { respondsStore } from '../../../Stores/RespondsStore';
 import { modalStore } from '../../../Stores/ModalStore';
@@ -16,6 +15,7 @@ import { modalStore } from '../../../Stores/ModalStore';
 import EditOrderDialog from '../../Dialogs/EditOrderDialog';
 import RespondDialog from '../../Dialogs/RespondDialog';
 import EditRespondDialog from '../../Dialogs/EditRespondDialog';
+import SubmitRespondDialog from '../../Dialogs/SubmitRespondDialog';
 
 interface IOrderProps {
     match: any;
@@ -24,7 +24,6 @@ interface IOrderProps {
 @observer
 export default class Order extends React.Component<IOrderProps, {}> {
     @observable order: OrderModel | null = null;
-    @observable responds: RespondModel[] = [];
 
     constructor(props: any) {
         super(props);
@@ -71,8 +70,6 @@ export default class Order extends React.Component<IOrderProps, {}> {
                             <div className="row">
                                 {this.order.status === 0 && <h5>Active</h5>}
                                 {this.order.status === 1 && <h5>Submited</h5>}
-                                {this.order.status === 2 && <h5>UnSubmited</h5>}
-                                {this.order.status === 3 && <h5>Done</h5>}
                             </div>
                             <div className="box-body">
                                 <hr />
@@ -106,9 +103,12 @@ export default class Order extends React.Component<IOrderProps, {}> {
                                             <li className="text-muted">
                                                 {this.order.address}
                                             </li>
-                                            {this.responds && (
+                                            {respondsStore.responds && (
                                                 <li className="text-muted">
-                                                    {this.responds.length}{' '}
+                                                    {
+                                                        respondsStore.responds
+                                                            .length
+                                                    }{' '}
                                                     откликов
                                                 </li>
                                             )}
@@ -124,7 +124,8 @@ export default class Order extends React.Component<IOrderProps, {}> {
                                             {this.order.completedOn}{' '}
                                         </p>
                                     </div>
-                                    {appStore.isAuthorize &&
+                                    {this.order.status !== 1 &&
+                                        appStore.isAuthorize &&
                                         appStore.isExecutor &&
                                         appStore.currentUserId !==
                                             this.order.userId && (
@@ -148,6 +149,7 @@ export default class Order extends React.Component<IOrderProps, {}> {
                 <hr />
                 {(respondsStore.responds || []).map(
                     (respond: any, index: number) => {
+                        console.log(respond);
                         return (
                             <div
                                 key={respond.id + index}
@@ -180,20 +182,40 @@ export default class Order extends React.Component<IOrderProps, {}> {
                                             </h5>
                                         </div>
                                         <div className="col">
-                                            {
-                                                <Button
-                                                    className="pull-right"
-                                                    variant="warning"
-                                                    onClick={() =>
-                                                        this.openEditRespondDialog(
-                                                            respond
-                                                        )
-                                                    }
-                                                >
-                                                    Edit a respond
-                                                </Button>
-                                            }
-                                            {/* <a className="text-white pull-right submit-respond" href="" style="margin-right: 80px;">Submit</a> */}
+                                            {appStore.isAuthorize &&
+                                                appStore.currentExecutorId ===
+                                                    respond.executorId.toString() && (
+                                                    <Button
+                                                        className="pull-right"
+                                                        variant="warning"
+                                                        onClick={() =>
+                                                            this.openEditRespondDialog(
+                                                                respond
+                                                            )
+                                                        }
+                                                    >
+                                                        Edit a respond
+                                                    </Button>
+                                                )}
+                                        </div>
+                                        <div className="col">
+                                            {this.order &&
+                                                this.order.status !== 1 &&
+                                                appStore.isAuthorize &&
+                                                appStore.currentUserId ===
+                                                    this.order.userId.toString() && (
+                                                    <Button
+                                                        className="pull-right"
+                                                        variant="success"
+                                                        onClick={() =>
+                                                            this.openSubmitRespondDialog(
+                                                                respond.id
+                                                            )
+                                                        }
+                                                    >
+                                                        Submit
+                                                    </Button>
+                                                )}
                                         </div>
                                     </div>
                                     <div className="box-body">
@@ -210,6 +232,15 @@ export default class Order extends React.Component<IOrderProps, {}> {
                                                     </small>
                                                 </p>
                                             </div>
+                                            {respond.status === 1 && (
+                                                <div className="col">
+                                                    <p>
+                                                        <small className="text-muted">
+                                                            Submited
+                                                        </small>
+                                                    </p>
+                                                </div>
+                                            )}
                                         </div>
                                     </div>
                                 </div>
@@ -253,6 +284,15 @@ export default class Order extends React.Component<IOrderProps, {}> {
         modalStore.showModal(
             <EditRespondDialog respond={respond} />,
             'Leave respond'
+        );
+    };
+
+    openSubmitRespondDialog = (id: number) => {
+        if (!this.order) return;
+
+        modalStore.showModal(
+            <SubmitRespondDialog order={this.order} id={id} />,
+            'Submit respond'
         );
     };
 }

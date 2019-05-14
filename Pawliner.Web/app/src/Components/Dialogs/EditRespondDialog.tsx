@@ -70,7 +70,7 @@ export default class EditRespondDialog extends React.Component<
             content: this.state.content
         };
 
-        ApiService.putData(ApiUrls.CommentsUrl, data).then((response: any) => {
+        ApiService.putData(ApiUrls.RespondsUrl, data).then((response: any) => {
             respondsStore.responds.forEach((element: any) => {
                 if (element.id === response.id) {
                     element.content = response.content;
