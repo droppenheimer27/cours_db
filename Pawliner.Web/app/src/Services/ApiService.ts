@@ -4,6 +4,8 @@ import { appStore } from '../Stores/AppStore';
 export interface ParamsModel {
     filter?: string | null;
     search?: string;
+    currentPage?: number;
+    pageSize?: number;
 }
 
 export default class ApiService {
@@ -26,12 +28,15 @@ export default class ApiService {
         }
     }
 
-    static async postData(url: string, data: any) {
+    static async postData(url: string, data: any, isMultipart?: boolean) {
         const config = {
             headers: {
-                Authorization: appStore.currentToken
+                Authorization: appStore.currentToken,
+                contentType: ''
             }
         };
+
+        if (isMultipart) config.headers.contentType = 'multipart/form-data';
 
         try {
             return await axios

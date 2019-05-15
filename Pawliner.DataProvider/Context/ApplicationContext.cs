@@ -11,6 +11,7 @@ namespace Pawliner.DataProvider.Context
         public DbSet<Service> Services { get; set; }
         public DbSet<Respond> Responds { get; set; }
         public DbSet<Comment> Comments { get; set; }
+        public DbSet<Photo> Photos { get; set; }
 
         public ApplicationContext() : base()
         {

@@ -1,7 +1,7 @@
 import React from 'react';
 import { observer } from 'mobx-react';
-import { observable, action } from 'mobx';
-import { Button } from 'react-bootstrap';
+import { observable } from 'mobx';
+import { Form, Button, Col, Carousel } from 'react-bootstrap';
 
 import ApiService from '../../../Services/ApiService';
 import { ApiUrls } from '../../../AppConstants';
@@ -21,11 +21,18 @@ interface IExecutorProps {
 }
 
 @observer
-export default class Executor extends React.Component<IExecutorProps, {}> {
+export default class Executor extends React.Component<
+    IExecutorProps,
+    { images: any[] }
+> {
     @observable executor: ExecutorModel | null = null;
 
     constructor(props: any) {
         super(props);
+
+        this.state = {
+            images: []
+        };
 
         this.loadData();
     }
@@ -114,7 +121,99 @@ export default class Executor extends React.Component<IExecutorProps, {}> {
                                     }}
                                 >
                                     <div className="col">
-                                        <p>{this.executor.description}</p>
+                                        {this.state.images.length > 0 && (
+                                            <div className="row">
+                                                <h3>Gallery</h3>
+                                            </div>
+                                        )}
+                                        <div className="row">
+                                            {this.state.images.length > 0 && (
+                                                <React.Fragment>
+                                                    <Carousel
+                                                        style={{
+                                                            marginTop: '3rem',
+                                                            width: '640px',
+                                                            height: '480px',
+                                                            marginBottom: '2rem'
+                                                        }}
+                                                    >
+                                                        {this.state.images.map(
+                                                            (
+                                                                image: any,
+                                                                index: number
+                                                            ) => {
+                                                                return (
+                                                                    <Carousel.Item
+                                                                        key={
+                                                                            index
+                                                                        }
+                                                                    >
+                                                                        <img
+                                                                            className="d-block w-100"
+                                                                            src={
+                                                                                process
+                                                                                    .env
+                                                                                    .PUBLIC_URL +
+                                                                                image.blob
+                                                                            }
+                                                                            alt=""
+                                                                            width="640"
+                                                                            height="480"
+                                                                        />
+                                                                    </Carousel.Item>
+                                                                );
+                                                            }
+                                                        )}
+                                                    </Carousel>
+                                                </React.Fragment>
+                                            )}
+                                        </div>
+                                        {appStore.currentUserId ===
+                                            this.executor.userId && (
+                                            <div className="row">
+                                                <Form>
+                                                    <Form.Row>
+                                                        <Col>
+                                                            <Form.Control
+                                                                type="file"
+                                                                multiple
+                                                                placeholder="First name"
+                                                                onChange={(
+                                                                    event: any
+                                                                ) =>
+                                                                    this.handleUploading(
+                                                                        event
+                                                                    )
+                                                                }
+                                                            />
+                                                        </Col>
+                                                        {this.state.images && (
+                                                            <Col>
+                                                                <Button
+                                                                    variant="primary"
+                                                                    style={{
+                                                                        marginLeft:
+                                                                            '2rem'
+                                                                    }}
+                                                                    onClick={
+                                                                        this
+                                                                            .sendFiles
+                                                                    }
+                                                                >
+                                                                    Send
+                                                                </Button>
+                                                            </Col>
+                                                        )}
+                                                    </Form.Row>
+                                                </Form>
+                                            </div>
+                                        )}
+                                        <div
+                                            className="row"
+                                            style={{ marginTop: '5rem' }}
+                                        >
+                                            <p>{this.executor.description}</p>
+                                        </div>
                                     </div>
                                     <div className="col col-lg-2">
                                         <ul>
@@ -223,13 +322,54 @@ export default class Executor extends React.Component<IExecutorProps, {}> {
     }
 
     async loadData() {
-        this.executor = await ApiService.getData(
+        const data = await ApiService.getData(
             ApiUrls.ExecutorsUrl + '/' + this.props.match.params.id
         );
+
+        this.executor = data.executor;
+
+        const images: any[] = [];
+        data.photos.forEach((value: any) => {
+            images.push({
+                blob: '/' + value.path,
+                file: value
+            });
+        });
+        this.setState(prevState => {
+            return { images: [...images, ...prevState.images] };
+        });
+
         commentsStore.comments = await ApiService.getData(
             ApiUrls.CommentsUrl + '/' + this.props.match.params.id
         );
     }
+
+    handleUploading(event: any) {
+        let images: any[] = [];
+        [...event.target.files].forEach(value => {
+            images.push({
+                blob: URL.createObjectURL(value),
+                file: value
+            });
+        });
+        this.setState(prevState => {
+            return { images: [...images, ...prevState.images] };
+        });
+    }
+
+    sendFiles = () => {
+        if (!this.executor) return;
+
+        const files = this.state.images.map(value => value.file);
+
+        const formData = new FormData();
+        formData.append('id', this.executor.id.toString());
+        files.map((file: File, index: number) => {
+            formData.append('files', file);
+        });
+
+        ApiService.postData(ApiUrls.ExecutorPhotosUrl, formData);
+    };
 
     openCommentDialog = () => {
         modalStore.showModal(

@@ -1,9 +1,11 @@
 ﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Pawliner.DataProvider.Context;
 using Pawliner.DataProvider.Models;
 using Pawliner.Web.ViewModels;
+using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Threading.Tasks;
@@ -15,26 +17,53 @@ namespace Pawliner.Web.Controllers
     public class ExecutorsController : ControllerBase
     {
         private readonly ApplicationContext _database;
+        private readonly IHostingEnvironment _hostingEnvironment;
 
-        public ExecutorsController()
+        public ExecutorsController(IHostingEnvironment hostingEnvironment)
         {
             _database = new ApplicationContext();
+            _hostingEnvironment = hostingEnvironment;
         }
 
         [HttpGet]
-        public IEnumerable<Executor> Get(string search = "", string filter = "")
+        public async Task<IActionResult> Get(string search = "", string filter = "", int currentPage = 1, int pageSize = 3)
         {
-            var executors = _database.Executors.FromSql("dbo.GET_EXECUTORS @search, @filter", 
-                new SqlParameter("@search", search), 
-                new SqlParameter("@filter", filter));
-            return executors;
+            var executors = await _database.Executors.FromSql("dbo.GET_EXECUTORS @search, " +
+                "@filter, " +
+                "@currentPage, " +
+                "@pageSize",
+                new SqlParameter("@search", search),
+                new SqlParameter("@filter", filter),
+                new SqlParameter("@currentPage", currentPage),
+                new SqlParameter("@pageSize", pageSize)).ToListAsync();
+
+            var homeViewModel = new HomeViewModel<Executor>
+            {
+                Items = executors,
+                Pagination = new PageViewModel
+                {
+                    CurrentPage = currentPage,
+                    PageSize = pageSize
+                }
+            };
+
+            return Ok(homeViewModel);
         }
 
         [HttpGet("{id}")]
-        public async Task<Executor> Get(int id)
+        public async Task<ExecutorPhotosViewModel> Get(int id)
         {
             var executor = await _database.Executors.FromSql("dbo.GET_EXECUTOR @id", new SqlParameter("@id", id)).FirstAsync();
-            return executor;
+            var photos = _database.Photos.FromSql("dbo.GET_EXECUTOR_PHOTOS @id", new SqlParameter("@id", id));
+            var listPhotos = await photos.FirstOrDefaultAsync(p => p.Id == 0) != null ? new List<Photo>() : await photos.ToListAsync();
+
+            var executorViewModel = new ExecutorPhotosViewModel
+            {
+                Executor = executor,
+                Photos = listPhotos
+            };
+
+            return executorViewModel;
         }
 
         [Authorize]
@@ -120,6 +149,32 @@ namespace Pawliner.Web.Controllers
             }
 
             return BadRequest();
+        }
+
+        [Authorize]
+        [HttpPost("upload-images")]
+        public async Task<IActionResult> UploadImages([FromForm] FileViewModel model)
+        {
+            string currentRootPath = _hostingEnvironment.ContentRootPath;
+            string imagesPath = "/app/public/images/";
+
+            foreach (var file in model.Files)
+            {
+                var photoId = Guid.NewGuid() + System.IO.Path.GetExtension(file.FileName);
+                using (var fileStream = new System.IO.FileStream(currentRootPath + imagesPath + photoId, System.IO.FileMode.Create))
+                {
+                    await file.CopyToAsync(fileStream);
+                }
+
+                await _database.Database.ExecuteSqlCommandAsync("dbo.INSERT_EXECUTOR_PHOTO @executorId, " +
+                    "@fileName, " +
+                    "@path",
+                    new SqlParameter("@executorId", model.Id),
+                    new SqlParameter("@fileName", file.FileName),
+                    new SqlParameter("@path", "images/" + photoId));
+            }
+
+            return Ok();
         }
     }
 }

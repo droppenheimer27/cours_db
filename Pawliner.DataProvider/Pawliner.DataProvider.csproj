@@ -444,6 +444,7 @@
     <Compile Include="Models\Comment.cs" />
     <Compile Include="Models\Executor.cs" />
     <Compile Include="Models\Order.cs" />
+    <Compile Include="Models\Photo.cs" />
     <Compile Include="Models\Respond.cs" />
     <Compile Include="Models\AspNetUser.cs" />
     <Compile Include="Models\Service.cs" />
